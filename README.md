@@ -50,6 +50,33 @@ npm run dev
 
 Acesse http://localhost:3001
 
+### Para QAs — Apontar para o backend
+
+> O frontend depende do backend rodando. Suba o backend primeiro (veja o README do `erp-licitai-backend`).
+
+Crie um `.env.local` com a URL da API:
+
+```bash
+# .env.local
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
+
+| Recurso | URL |
+|---------|-----|
+| Frontend | `http://localhost:3001` |
+| Backend API | `http://localhost:3000/api` |
+| Swagger | `http://localhost:3000/api/docs` |
+| Login teste | `admin@orgao.gov.br` / `Admin@123` |
+
+### Resetar ambiente para teste limpo
+
+```bash
+# No repo backend:
+docker-compose down -v && docker-compose up -d
+npm run migration:run && npm run seed
+npm run start:dev
+```
+
 ## Testes
 
 ```bash
