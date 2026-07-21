@@ -13,7 +13,9 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-      }).catch(() => {});
+      }).catch((err) => {
+        console.error("Erro ao revogar token no backend:", err);
+      });
     }
 
     const response = NextResponse.json({ message: "Logout realizado" });

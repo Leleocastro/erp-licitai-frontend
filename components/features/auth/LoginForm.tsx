@@ -65,7 +65,7 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form data-cy="core-login-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
             <div
               data-cy="core-login-error-message"
@@ -95,10 +95,12 @@ export function LoginForm() {
               placeholder="seu@email.com"
               data-cy="core-login-input-email"
               disabled={isBlocked}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
               {...register("email")}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">
+              <p id="email-error" className="text-sm text-destructive">
                 {errors.email.message}
               </p>
             )}
@@ -112,10 +114,12 @@ export function LoginForm() {
               placeholder="Sua senha"
               data-cy="core-login-input-senha"
               disabled={isBlocked}
+              aria-invalid={!!errors.senha}
+              aria-describedby={errors.senha ? "senha-error" : undefined}
               {...register("senha")}
             />
             {errors.senha && (
-              <p className="text-sm text-destructive">
+              <p id="senha-error" className="text-sm text-destructive">
                 {errors.senha.message}
               </p>
             )}
