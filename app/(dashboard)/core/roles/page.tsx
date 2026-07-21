@@ -51,6 +51,8 @@ export default function RolesPage() {
   const [searchNome, setSearchNome] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletingRole, setDeletingRole] = useState<Role | null>(null);
 
   const {
     data: rolesData,
@@ -146,8 +148,20 @@ export default function RolesPage() {
   };
 
   const handleDelete = (role: Role) => {
-    if (window.confirm(`Deseja realmente excluir a role "${role.nome}"?`)) {
-      deleteMutation.mutate(role.id);
+    setDeletingRole(role);
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+    setDeletingRole(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingRole) {
+      deleteMutation.mutate(deletingRole.id);
+      setDeleteOpen(false);
+      setDeletingRole(null);
     }
   };
 
@@ -181,11 +195,11 @@ export default function RolesPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <Card>
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Roles</h1>
-          <p className="text-sm text-muted-foreground">Gerencie as roles e permissoes do sistema</p>
+          <CardTitle>Roles</CardTitle>
+          <CardDescription>Gerencie as roles e permissoes do sistema</CardDescription>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -244,6 +258,7 @@ export default function RolesPage() {
                         >
                           <input
                             type="checkbox"
+                            data-cy={`core-roles-checkbox-permissao-${permissao.id}`}
                             checked={form.watch("permissoesIds").includes(permissao.id)}
                             onChange={() => togglePermissao(permissao.id)}
                             className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
@@ -264,7 +279,7 @@ export default function RolesPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                <Button type="button" variant="outline" data-cy="core-roles-btn-cancelar" onClick={() => setDialogOpen(false)}>
                   Cancelar
                 </Button>
                 <Button type="submit" data-cy="core-roles-btn-salvar" disabled={isPending}>
@@ -274,27 +289,20 @@ export default function RolesPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Listagem de Roles</CardTitle>
-          <CardDescription>
-            {rolesData ? `${rolesData.total} role(s) encontrada(s)` : "Lista de roles cadastradas"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      </CardHeader>
+      <CardContent>
           <form onSubmit={handleSearch} className="mb-4 flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar por nome..."
+                data-cy="core-roles-input-filtro-nome"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 className="pl-9"
               />
             </div>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="secondary" data-cy="core-roles-btn-filtrar">
               Filtrar
             </Button>
           </form>
@@ -394,6 +402,7 @@ export default function RolesPage() {
                     <Button
                       variant="outline"
                       size="sm"
+                      data-cy="core-roles-btn-anterior"
                       disabled={page <= 1}
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                     >
@@ -403,6 +412,7 @@ export default function RolesPage() {
                     <Button
                       variant="outline"
                       size="sm"
+                      data-cy="core-roles-btn-proxima"
                       disabled={page >= totalPages}
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     >
@@ -415,7 +425,32 @@ export default function RolesPage() {
             </>
           )}
         </CardContent>
-      </Card>
-    </div>
+
+      <Dialog open={deleteOpen} onOpenChange={(open) => !open && handleDeleteClose()}>
+        <DialogContent data-cy="core-roles-modal-delete">
+          <DialogHeader>
+            <DialogTitle>Excluir Role</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir a role{" "}
+              <strong>{deletingRole?.nome}</strong>? Esta ação não pode ser
+              desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" data-cy="core-roles-btn-cancelar-delete" onClick={handleDeleteClose}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              data-cy="core-roles-btn-confirmar-delete"
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
   );
 }

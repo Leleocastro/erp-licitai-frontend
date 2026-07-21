@@ -81,6 +81,8 @@ export default function OrgaosPage() {
 
   const [open, setOpen] = useState(false);
   const [editingOrgao, setEditingOrgao] = useState<Orgao | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletingOrgao, setDeletingOrgao] = useState<Orgao | null>(null);
 
   const form = useForm<OrgaoFormData>({
     resolver: zodResolver(orgaoSchema),
@@ -173,6 +175,24 @@ export default function OrgaosPage() {
     form.reset();
   }
 
+  function handleOpenDelete(orgao: Orgao) {
+    setDeletingOrgao(orgao);
+    setDeleteOpen(true);
+  }
+
+  function handleDeleteClose() {
+    setDeleteOpen(false);
+    setDeletingOrgao(null);
+  }
+
+  function handleConfirmDelete() {
+    if (deletingOrgao) {
+      deleteMutation.mutate(deletingOrgao.id);
+      setDeleteOpen(false);
+      setDeletingOrgao(null);
+    }
+  }
+
   function onSubmit(data: OrgaoFormData) {
     if (editingOrgao) {
       updateMutation.mutate({ id: editingOrgao.id, data });
@@ -199,31 +219,24 @@ export default function OrgaosPage() {
     filters.razao_social || filters.esfera || filters.status;
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <Card>
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Órgãos</h1>
-          <p className="text-sm text-muted-foreground">
-            Gerencie os órgãos do sistema
-          </p>
+          <CardTitle>Órgãos</CardTitle>
+          <CardDescription>Gerencie os órgãos do sistema</CardDescription>
         </div>
         <Button onClick={handleOpenCreate} data-cy="core-orgaos-btn-novo">
           <Plus className="mr-2 h-4 w-4" />
           Novo
         </Button>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre os órgãos pelos campos abaixo</CardDescription>
-        </CardHeader>
-        <CardContent>
+      </CardHeader>
+      <CardContent>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-2">
               <Label htmlFor="filter-razao-social">Razão Social</Label>
               <Input
                 id="filter-razao-social"
+                data-cy="core-orgaos-input-filtro-razao-social"
                 placeholder="Buscar por razão social..."
                 value={search.razao_social}
                 onChange={(e) =>
@@ -243,7 +256,7 @@ export default function OrgaosPage() {
                   setSearch((prev) => ({ ...prev, esfera: value }))
                 }
               >
-                <SelectTrigger id="filter-esfera">
+                <SelectTrigger id="filter-esfera" data-cy="core-orgaos-select-filtro-esfera">
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -262,7 +275,7 @@ export default function OrgaosPage() {
                   setSearch((prev) => ({ ...prev, status: value }))
                 }
               >
-                <SelectTrigger id="filter-status">
+                <SelectTrigger id="filter-status" data-cy="core-orgaos-select-filtro-status">
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,20 +286,16 @@ export default function OrgaosPage() {
               </Select>
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleSearch}>Filtrar</Button>
+              <Button data-cy="core-orgaos-btn-filtrar" onClick={handleSearch}>Filtrar</Button>
               {hasActiveFilters && (
-                <Button variant="outline" onClick={handleClearFilters}>
+                <Button variant="outline" data-cy="core-orgaos-btn-limpar" onClick={handleClearFilters}>
                   Limpar
                 </Button>
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="mt-6 overflow-x-auto">
             <Table data-cy="core-orgaos-table-lista">
               <TableHeader>
                 <TableRow>
@@ -393,15 +402,7 @@ export default function OrgaosPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Tem certeza que deseja excluir o órgão "${orgao.razao_social}"?`,
-                                )
-                              ) {
-                                deleteMutation.mutate(orgao.id);
-                              }
-                            }}
+                            onClick={() => handleOpenDelete(orgao)}
                             data-cy="core-orgaos-btn-excluir"
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
@@ -416,7 +417,6 @@ export default function OrgaosPage() {
             </Table>
           </div>
         </CardContent>
-      </Card>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
@@ -427,6 +427,7 @@ export default function OrgaosPage() {
             <Button
               variant="outline"
               size="sm"
+              data-cy="core-orgaos-btn-anterior"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
@@ -457,6 +458,7 @@ export default function OrgaosPage() {
             <Button
               variant="outline"
               size="sm"
+              data-cy="core-orgaos-btn-proxima"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             >
@@ -466,8 +468,8 @@ export default function OrgaosPage() {
         </div>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen} data-cy="core-orgaos-modal-form">
-        <DialogContent>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent data-cy="core-orgaos-modal-form">
           <DialogHeader>
             <DialogTitle>
               {editingOrgao ? "Editar Órgão" : "Novo Órgão"}
@@ -595,6 +597,7 @@ export default function OrgaosPage() {
               <Button
                 type="button"
                 variant="outline"
+                data-cy="core-orgaos-btn-cancelar"
                 onClick={handleClose}
                 disabled={isPending}
               >
@@ -611,6 +614,32 @@ export default function OrgaosPage() {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+
+      <Dialog open={deleteOpen} onOpenChange={(open) => !open && handleDeleteClose()}>
+        <DialogContent data-cy="core-orgaos-modal-delete">
+          <DialogHeader>
+            <DialogTitle>Excluir Órgão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o órgão{" "}
+              <strong>{deletingOrgao?.razao_social}</strong>? Esta ação não pode ser
+              desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" data-cy="core-orgaos-btn-cancelar-delete" onClick={handleDeleteClose}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              data-cy="core-orgaos-btn-confirmar-delete"
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
   );
 }

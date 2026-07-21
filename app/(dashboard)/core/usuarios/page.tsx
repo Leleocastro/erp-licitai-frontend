@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 import { api } from "@/lib/api";
-import type { Usuario, PaginatedResponse } from "@/lib/types";
+import type { Usuario, Orgao, PaginatedResponse } from "@/lib/types";
 import { usuarioSchema, type UsuarioFormData } from "@/lib/validations";
 
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,11 @@ export default function UsuariosPage() {
       });
       return api.get<PaginatedResponse<Usuario>>(`/core/usuarios?${params}`);
     },
+  });
+
+  const { data: orgaosData } = useQuery({
+    queryKey: ["orgaos-list"],
+    queryFn: () => api.get<PaginatedResponse<Orgao>>("/core/orgaos?limit=100"),
   });
 
   const {
@@ -222,6 +227,7 @@ export default function UsuariosPage() {
         <div className="mb-4 flex flex-col gap-2 sm:flex-row">
           <Input
             placeholder="Nome"
+            data-cy="core-usuarios-input-filtro-nome"
             value={nomeInput}
             onChange={(e) => setNomeInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && applyFilters()}
@@ -231,7 +237,7 @@ export default function UsuariosPage() {
             value={statusFilter || "all"}
             onValueChange={handleStatusFilterChange}
           >
-            <SelectTrigger className="sm:max-w-[160px]">
+            <SelectTrigger data-cy="core-usuarios-select-filtro-status" className="sm:max-w-[160px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -242,12 +248,13 @@ export default function UsuariosPage() {
           </Select>
           <Input
             placeholder="Órgão"
+            data-cy="core-usuarios-input-filtro-orgao"
             value={orgaoInput}
             onChange={(e) => setOrgaoInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && applyFilters()}
             className="sm:max-w-[200px]"
           />
-          <Button variant="secondary" onClick={applyFilters}>
+          <Button variant="secondary" data-cy="core-usuarios-btn-filtrar" onClick={applyFilters}>
             Filtrar
           </Button>
         </div>
@@ -333,6 +340,7 @@ export default function UsuariosPage() {
                 <Button
                   variant="outline"
                   size="sm"
+                  data-cy="core-usuarios-btn-anterior"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                 >
@@ -344,6 +352,7 @@ export default function UsuariosPage() {
                 <Button
                   variant="outline"
                   size="sm"
+                  data-cy="core-usuarios-btn-proximo"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => p + 1)}
                 >
@@ -432,8 +441,25 @@ export default function UsuariosPage() {
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="orgaoId">ID do Órgão</Label>
-                <Input id="orgaoId" {...register("orgaoId")} />
+                <Label htmlFor="orgaoId">Órgão</Label>
+                <Controller
+                  name="orgaoId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger data-cy="core-usuarios-select-orgao">
+                        <SelectValue placeholder="Selecione o órgão" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {orgaosData?.data.map((orgao) => (
+                          <SelectItem key={orgao.id} value={orgao.id}>
+                            {orgao.razao_social}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.orgaoId && (
                   <p className="text-sm text-destructive">
                     {errors.orgaoId.message}
@@ -445,6 +471,7 @@ export default function UsuariosPage() {
               <Button
                 type="button"
                 variant="outline"
+                data-cy="core-usuarios-btn-cancelar-form"
                 onClick={handleFormClose}
               >
                 Cancelar
@@ -475,7 +502,7 @@ export default function UsuariosPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleDeleteClose}>
+            <Button type="button" variant="outline" data-cy="core-usuarios-btn-cancelar-delete" onClick={handleDeleteClose}>
               Cancelar
             </Button>
             <Button
