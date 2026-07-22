@@ -256,7 +256,7 @@ export default function OrgaosPage() {
                   setSearch((prev) => ({ ...prev, esfera: value }))
                 }
               >
-                <SelectTrigger id="filter-esfera" data-cy="core-orgaos-select-filtro-esfera">
+                <SelectTrigger id="filter-esfera" data-cy="core-orgaos-select-filtro-esfera" aria-label="Filtrar por esfera">
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,7 +275,7 @@ export default function OrgaosPage() {
                   setSearch((prev) => ({ ...prev, status: value }))
                 }
               >
-                <SelectTrigger id="filter-status" data-cy="core-orgaos-select-filtro-status">
+                <SelectTrigger id="filter-status" data-cy="core-orgaos-select-filtro-status" aria-label="Filtrar por status">
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
@@ -549,6 +549,7 @@ export default function OrgaosPage() {
                       <SelectTrigger
                         id="esfera"
                         data-cy="core-orgaos-select-esfera"
+                        aria-label="Esfera"
                       >
                         <SelectValue placeholder="Selecione a esfera" />
                       </SelectTrigger>
@@ -576,7 +577,7 @@ export default function OrgaosPage() {
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger id="status">
+                      <SelectTrigger id="status" data-cy="core-orgaos-select-status" aria-label="Status">
                         <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
                       <SelectContent>
