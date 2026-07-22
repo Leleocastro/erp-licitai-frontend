@@ -549,7 +549,7 @@ export default function OrgaosPage() {
                       <SelectTrigger
                         id="esfera"
                         data-cy="core-orgaos-select-esfera"
-                        aria-label="Esfera"
+                        aria-label="Selecionar esfera"
                       >
                         <SelectValue placeholder="Selecione a esfera" />
                       </SelectTrigger>
@@ -577,7 +577,7 @@ export default function OrgaosPage() {
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger id="status" data-cy="core-orgaos-select-status" aria-label="Status">
+                      <SelectTrigger id="status" data-cy="core-orgaos-select-status" aria-label="Selecionar status">
                         <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
                       <SelectContent>

@@ -237,7 +237,7 @@ export default function UsuariosPage() {
             value={statusFilter || "all"}
             onValueChange={handleStatusFilterChange}
           >
-            <SelectTrigger data-cy="core-usuarios-select-filtro-status" aria-label="Filtrar por status" className="sm:max-w-[160px]">
+            <SelectTrigger data-cy="core-usuarios-select-filtro-status" className="sm:max-w-[160px]" aria-label="Filtrar por status">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -424,7 +424,7 @@ export default function UsuariosPage() {
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger data-cy="core-usuarios-select-status" aria-label="Status">
+                      <SelectTrigger data-cy="core-usuarios-select-status" aria-label="Selecionar status">
                         <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -447,7 +447,7 @@ export default function UsuariosPage() {
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger data-cy="core-usuarios-select-orgao" aria-label="Órgão">
+                      <SelectTrigger data-cy="core-usuarios-select-orgao" aria-label="Selecionar órgão">
                         <SelectValue placeholder="Selecione o órgão" />
                       </SelectTrigger>
                       <SelectContent>
