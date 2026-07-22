@@ -2,7 +2,7 @@ import { Given, Then } from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 
 Given("I am on the login page", async function () {
-  await this.page.goto("/(auth)/login");
+  await this.page.goto("/login");
 });
 
 Then("I should see the login form", async function () {
