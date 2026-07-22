@@ -1,4 +1,4 @@
-import { World, setWorldConstructor } from "@cucumber/cucumber";
+import { World, setWorldConstructor, Before, After } from "@cucumber/cucumber";
 import { Browser, BrowserContext, Page, chromium } from "@playwright/test";
 
 class CustomWorld extends World {
@@ -8,7 +8,7 @@ class CustomWorld extends World {
 
   async open() {
     this.browser = await chromium.launch();
-    this.context = await this.browser.newContext();
+    this.context = await this.browser.newContext({ baseURL: "http://localhost:3001" });
     this.page = await this.context.newPage();
   }
 
@@ -20,3 +20,11 @@ class CustomWorld extends World {
 }
 
 setWorldConstructor(CustomWorld);
+
+Before(async function () {
+  await (this as CustomWorld).open();
+});
+
+After(async function () {
+  await (this as CustomWorld).close();
+});
