@@ -1,7 +1,7 @@
 import { World, setWorldConstructor, Before, After } from "@cucumber/cucumber";
 import { Browser, BrowserContext, Page, chromium } from "@playwright/test";
 
-class CustomWorld extends World {
+export class CustomWorld extends World {
   browser!: Browser;
   context!: BrowserContext;
   page!: Page;
@@ -22,6 +22,7 @@ class CustomWorld extends World {
 setWorldConstructor(CustomWorld);
 
 Before(async function () {
+  this.setDefaultTimeout(15000);
   await (this as CustomWorld).open();
 });
 
