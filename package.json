@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "playwright test && cucumber-js",
     "test:e2e": "playwright test",
-    "test:bdd": "cucumber-js"
+    "test:bdd": "cucumber-js",
+    "test:a11y": "playwright test tests/e2e/accessibility.spec.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
